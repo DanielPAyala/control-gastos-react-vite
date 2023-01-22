@@ -1,32 +1,64 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import './App.css'
+import Header from './components/Header'
+import ListadoGastos from './components/ListadoGastos'
+import Modal from './components/Modal'
+import { generarId } from './helpers/helpers'
+
+import IconoNuevoGasto from './img/nuevo-gasto.svg'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [presupuesto, setPresupuesto] = useState(0)
+  const [isValidPresupuesto, setIsValidPresupuesto] = useState(false)
+  const [modal, setModal] = useState(false)
+  const [animarModal, setAnimarModal] = useState(false)
+  const [gastos, setGastos] = useState([])
+
+  const handleNuevoGasto = () => {
+    setModal(true)
+    setTimeout(() => {
+      setAnimarModal(true)
+    }, 500)
+  }
+
+  const guardarGasto = (gasto) => {
+    gasto.id = generarId()
+    gasto.fecha = Date.now()
+    setGastos([...gastos, gasto])
+  }
 
   return (
-    <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+    <div className={modal ? 'fijar' : ''}>
+      <Header
+        presupuesto={presupuesto}
+        setPresupuesto={setPresupuesto}
+        isValidPresupuesto={isValidPresupuesto}
+        setIsValidPresupuesto={setIsValidPresupuesto}
+        gastos={gastos}
+      />
+
+      {isValidPresupuesto && (
+        <>
+          <main>
+            <ListadoGastos gastos={gastos}/>
+          </main>
+          <div className='nuevo-gasto'>
+            <img
+              src={IconoNuevoGasto}
+              alt='icono nuevo gasto'
+              onClick={handleNuevoGasto}
+            />
+          </div>
+        </>
+      )}
+
+      {modal && (
+        <Modal
+          setModal={setModal}
+          animarModal={animarModal}
+          setAnimarModal={setAnimarModal}
+          guardarGasto={guardarGasto}
+        ></Modal>
+      )}
     </div>
   )
 }
